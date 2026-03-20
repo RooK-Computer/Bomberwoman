@@ -45,41 +45,6 @@ function Level:isOccupied(x,y)
     return false
 end
 
-function Level:fillWithRubble()
-    local clearCoordinates ={
-        {1,1},
-        {1,2},
-        {2,1},
-        {15,1},
-        {14,1},
-        {15,2},
-        {1,7},
-        {1,6},
-        {2,7},
-        {15,7},
-        {14,7},
-        {15,6}
-    }
-    for y=1,7 do
-        for x=1,15 do
-            if self:isOccupied(x,y) == false then
-                local fill=true
-                for idx,coords in ipairs(clearCoordinates) do
-                    if x==coords[1] and y==coords[2] then
-                        fill=false
-                    end
-                end
-                if fill then
-                    local rubble = Rubble(x,y)
-                    rubble.level = self
-                    table.insert(self.items,rubble)
-                    self.map[y][x][1] = rubble
-                end
-            end
-        end
-    end
-end
-
 function Level:print()
     for y=1,7 do
         local line=""
