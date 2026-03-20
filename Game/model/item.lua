@@ -6,6 +6,7 @@ function Item:new(x,y)
     self.destructible=true
     self.moves=false
     self.occupies=false
+    self.level = nil
 end
 
 function Item:getX()
@@ -26,4 +27,7 @@ end
 
 function Item:Occupies()
     return self.occupies
+end
+
+function Item:update(dt)
 end

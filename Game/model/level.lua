@@ -2,6 +2,7 @@ Level = Object:extend()
 
 function Level:new()
     self.map = {}
+    self.items = {}
     for y=1,7 do
         self.map[y] = {}
         for x=1,15 do
@@ -10,7 +11,10 @@ function Level:new()
     end
     for y=2,6,2 do
         for x=2,14,2 do
-            self.map[y][x][1]=Wall(x,y)
+            local wall = Wall(x,y)
+            wall.level=self
+            table.insert(self.items,wall)
+            self.map[y][x][1]=wall
         end
     end
     self:fillWithRubble()
@@ -51,7 +55,10 @@ function Level:fillWithRubble()
                     end
                 end
                 if fill then
-                    self.map[y][x][1] = Rubble(x,y)
+                    local rubble = Rubble(x,y)
+                    rubble.level = self
+                    table.insert(self.items,rubble)
+                    self.map[y][x][1] = rubble
                 end
             end
         end
@@ -64,6 +71,8 @@ function Level:print()
         for x=1,15 do
             if #self.map[y][x] == 0 then
                 line = line.."."
+            elseif self.map[y][x][1]:is(Player) then
+                line = line.."x"
             elseif self.map[y][x][1]:isDestructible() then
                 line = line.."/"
             else 
@@ -71,5 +80,11 @@ function Level:print()
             end
         end
         print(line)
+    end
+end
+
+function Level:update(dt)
+    for idx,item in ipairs(self.items) do
+        item:update(dt)
     end
 end
