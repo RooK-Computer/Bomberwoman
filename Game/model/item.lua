@@ -5,6 +5,7 @@ function Item:new(x,y)
     self.y=y
     self.destructible=true
     self.moves=false
+    self.occupies=false
 end
 
 function Item:getX()
@@ -21,4 +22,8 @@ end
 
 function Item:canMove()
     return self.moves
+end
+
+function Item:Occupies()
+    return self.occupies
 end
