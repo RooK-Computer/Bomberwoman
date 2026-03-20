@@ -1,4 +1,5 @@
 Object = require "lib/classic"
+require "util/tableExt"
 require "model"
 
 CurrentLevel = Level()

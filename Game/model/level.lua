@@ -88,3 +88,58 @@ function Level:update(dt)
         item:update(dt)
     end
 end
+
+function Level:moveItem(item,dirX,dirY)
+    --TODO check if item can die and if destination has killsOnContact item
+    local newX = item:getX()+dirX
+    local newY = item:getY()+dirY
+    if newX < 1 or newY < 1 or newX > 15 or newY > 7 then
+        return false
+    end
+    if self:isOccupied(newX,newY) then
+        return false
+    end
+    local idx = tableExt.find(self.map[item:getY()][item:getX()],item)
+    table.remove(self.map[item:getY()][item:getX()],idx)
+    item:setX(newX)
+    item:setY(newY)
+    table.insert(self.map[newY][newX],item)
+    return true
+end
+
+function Level:ItemDropsItem(item,dropType)
+    local x = item:getX()
+    local y = item:getY()
+    local item = dropType(x,y)
+    item.level = self
+    table.insert(self.items,item)
+    table.insert(self.map[y][x],item)
+    return item
+end
+
+function Level:spawnItem(itemType,x,y)
+    --the rules are as follows:
+    --if the place is occupied, check the killing tables
+    --to check that, we have to create the item first
+    local item = itemType(x,y)
+    local placeable = true
+    if self:isOccupied(x,y) then
+        if self.map[y][x][1].canDie then 
+            placeable = true
+        else
+            placeable = false
+        end
+    end
+    if placeable then
+        table.insert(self.map[y][x],item)
+        table.insert(self.items,item)
+        item.level=self
+    end
+end
+
+function Level:destroyItem(item)
+    local idx = tableExt.find(self.map[item:getY()][item:getX()],item)
+    table.remove(self.map[item:getY()][item:getX()],idx)
+    idx = tableExt.find(self.items,item)
+    table.remove(self.items,idx)
+end

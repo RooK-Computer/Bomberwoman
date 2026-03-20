@@ -6,6 +6,8 @@ function Item:new(x,y)
     self.destructible=true
     self.moves=false
     self.occupies=false
+    self.killsOnContact=false
+    self.canDie=false
     self.level = nil
 end
 
@@ -13,8 +15,16 @@ function Item:getX()
     return self.x
 end
 
+function Item:setX(x)
+    self.x = x
+end
+
 function Item:getY()
     return self.y
+end
+
+function Item:setY(y)
+    self.y = y
 end
 
 function Item:isDestructible()

@@ -13,7 +13,19 @@ function Bomb:update(dt)
     Bomb.super.update(self,dt)
     self.ttl = self.ttl - dt
     if self.ttl <= 0 then
-        -- TODO: time to explode!
+        self:explode()
+    end
+end
+
+function Bomb:explode()
+    --we have to destroy ourselves to ensure that the place is empty.
+    self.level:destroyItem(self)
+    self.level:spawnItem(Explosion,self:getX(),self:getY())
+    for r=1,self.blastRadius do
+        self.level:spawnItem(Explosion,self:getX()+r,self:getY())
+        self.level:spawnItem(Explosion,self:getX(),self:getY()+r)
+        self.level:spawnItem(Explosion,self:getX()-r,self:getY())
+        self.level:spawnItem(Explosion,self:getX(),self:getY()-r)
     end
 end
 
@@ -24,4 +36,14 @@ function Explosion:new(x,y)
     self.occupies = false
     self.destructible = false
     self.moves = false
+    self.killsOnContact = true
+    self.ttl = 5
+end
+
+function Explosion:update(dt)
+    self.ttl = self.ttl - dt
+    if self.ttl < 0 then
+        self.level:destroyItem(self)
+    end
+    --TODO check if location contains killable items and kill them
 end
