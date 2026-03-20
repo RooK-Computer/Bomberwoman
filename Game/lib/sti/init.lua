@@ -93,6 +93,27 @@ function Map:init(path, plugins, ox, oy)
 	for i, tileset in ipairs(self.tilesets) do
 		assert(not tileset.filename, "STI does not support external Tilesets.\nYou need to embed all Tilesets.")
 
+		-- Tiled can render tiles at the map's grid size (tileset.tilerendersize == "grid")
+		-- and optionally scale them (tileset.fillmode). STI historically renders tiles at
+		-- their native tileset size; we compute a per-tileset render scale to match Tiled.
+		local rsx, rsy = 1, 1
+		if tileset.tilerendersize == "grid" and tileset.tilewidth and tileset.tileheight
+			and self.tilewidth and self.tileheight
+			and (self.tilewidth ~= tileset.tilewidth or self.tileheight ~= tileset.tileheight) then
+			rsx = self.tilewidth / tileset.tilewidth
+			rsy = self.tileheight / tileset.tileheight
+
+			local fillmode = tileset.fillmode or "stretch"
+			if fillmode == "preserve-aspect-fit" then
+				local s = math.min(rsx, rsy)
+				rsx, rsy = s, s
+			elseif fillmode == "preserve-aspect-crop" then
+				local s = math.max(rsx, rsy)
+				rsx, rsy = s, s
+			end
+		end
+		tileset._renderScaleX, tileset._renderScaleY = rsx, rsy
+
         if tileset.image then
             -- Cache images
             if lg.isCreated then
@@ -247,8 +268,10 @@ function Map:setTiles(index, tileset, gid)
 				height      = tileH,
 				sx          = 1,
 				sy          = 1,
+				render_sx   = tileset._renderScaleX or 1,
+				render_sy   = tileset._renderScaleY or 1,
 				r           = 0,
-				offset      = tileset.tileoffset,
+				offset      = tileset.tileoffset or { x = 0, y = 0 },
 			}
 
 			self.tiles[gid] = tile
@@ -281,7 +304,7 @@ function Map:setAtlasTiles(index, tileset, coords, gid)
             end
         end
 
-        local tile = {
+		local tile = {
             id          = tile.id,
             gid         = firstgid + tile.id,
             tileset     = index,
@@ -301,8 +324,10 @@ function Map:setAtlasTiles(index, tileset, coords, gid)
             height      = tile.height,
             sx          = 1,
             sy          = 1,
+			render_sx   = tileset._renderScaleX or 1,
+			render_sy   = tileset._renderScaleY or 1,
             r           = 0,
-            offset      = tileset.tileoffset,
+			offset      = tileset.tileoffset or { x = 0, y = 0 },
         }
 
         -- Be aware that in collections self.tiles can be a sparse array
@@ -469,50 +494,54 @@ function Map:getLayerTilePosition(layer, tile, x, y)
 	local tileW = self.tilewidth
 	local tileH = self.tileheight
 	local tileX, tileY
+	local render_sx = tile.render_sx or 1
+	local render_sy = tile.render_sy or 1
+	local offsetx = (tile.offset and tile.offset.x or 0) * render_sx
+	local offsety = (tile.offset and tile.offset.y or 0) * render_sy
 
 	if self.orientation == "orthogonal" then
-		tileX = (x - 1) * tileW + tile.offset.x
-		tileY = (y - 0) * tileH + tile.offset.y - tile.height
+		tileX = (x - 1) * tileW + offsetx
+		tileY = (y - 0) * tileH + offsety - (tile.height * render_sy)
 		tileX, tileY = utils.compensate(tile, tileX, tileY, tileW, tileH)
 	elseif self.orientation == "isometric" then
-		tileX = (x - y) * (tileW / 2) + tile.offset.x + layer.width * tileW / 2 - self.tilewidth / 2
-		tileY = (x + y - 2) * (tileH / 2) + tile.offset.y
+		tileX = (x - y) * (tileW / 2) + offsetx + layer.width * tileW / 2 - self.tilewidth / 2
+		tileY = (x + y - 2) * (tileH / 2) + offsety
 	else
 		local sideLen = self.hexsidelength or 0
 		if self.staggeraxis == "y" then
 			if self.staggerindex == "odd" then
 				if y % 2 == 0 then
-					tileX = (x - 1) * tileW + tileW / 2 + tile.offset.x
+					tileX = (x - 1) * tileW + tileW / 2 + offsetx
 				else
-					tileX = (x - 1) * tileW + tile.offset.x
+					tileX = (x - 1) * tileW + offsetx
 				end
 			else
 				if y % 2 == 0 then
-					tileX = (x - 1) * tileW + tile.offset.x
+					tileX = (x - 1) * tileW + offsetx
 				else
-					tileX = (x - 1) * tileW + tileW / 2 + tile.offset.x
+					tileX = (x - 1) * tileW + tileW / 2 + offsetx
 				end
 			end
 
 			local rowH = tileH - (tileH - sideLen) / 2
-			tileY = (y - 1) * rowH + tile.offset.y
+			tileY = (y - 1) * rowH + offsety
 		else
 			if self.staggerindex == "odd" then
 				if x % 2 == 0 then
-					tileY = (y - 1) * tileH + tileH / 2 + tile.offset.y
+					tileY = (y - 1) * tileH + tileH / 2 + offsety
 				else
-					tileY = (y - 1) * tileH + tile.offset.y
+					tileY = (y - 1) * tileH + offsety
 				end
 			else
 				if x % 2 == 0 then
-					tileY = (y - 1) * tileH + tile.offset.y
+					tileY = (y - 1) * tileH + offsety
 				else
-					tileY = (y - 1) * tileH + tileH / 2 + tile.offset.y
+					tileY = (y - 1) * tileH + tileH / 2 + offsety
 				end
 			end
 
 			local colW = tileW - (tileW - sideLen) / 2
-			tileX = (x - 1) * colW + tile.offset.x
+			tileX = (x - 1) * colW + offsetx
 		end
 	end
 
@@ -557,7 +586,14 @@ function Map:addNewLayerTile(layer, chunk, tile, x, y)
 	-- NOTE: STI can run headless so it is not guaranteed that a batch exists.
 	if batch then
 		instance.batch = batch
-		instance.id = batch:add(tile.quad, tileX, tileY, tile.r, tile.sx, tile.sy)
+		instance.id = batch:add(
+			tile.quad,
+			tileX,
+			tileY,
+			tile.r,
+			tile.sx * (tile.render_sx or 1),
+			tile.sy * (tile.render_sy or 1)
+		)
 	end
 
 	self.tileInstances[tile.gid] = self.tileInstances[tile.gid] or {}
@@ -872,7 +908,17 @@ function Map:update(dt)
 			if update and self.tileInstances[tile.gid] then
 				for _, j in pairs(self.tileInstances[tile.gid]) do
 					local t = self.tiles[tonumber(tile.animation[tile.frame].tileid) + self.tilesets[tile.tileset].firstgid]
-					j.batch:set(j.id, t.quad, j.x, j.y, j.r, tile.sx, tile.sy, 0, j.oy)
+					j.batch:set(
+						j.id,
+						t.quad,
+						j.x,
+						j.y,
+						j.r,
+						tile.sx * (tile.render_sx or 1),
+						tile.sy * (tile.render_sy or 1),
+						0,
+						j.oy
+					)
 				end
 			end
 		end
