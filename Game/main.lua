@@ -4,7 +4,9 @@ sti = require 'lib/sti' -- simple tiled loader for maps
 
 require "model"
 
-CurrentLevel = Level()
+LoadedLevel = sti("maps/bomberplane.lua",{},0,184)
+
+CurrentLevel = Level(LoadedLevel)
 
 CurrentLevel:print()
 
@@ -13,9 +15,11 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.print("Hello World", 400, 300)
+    LoadedLevel:draw()
 end
 
-function love.keypressed()
-    love.event.quit(0)
+function love.keypressed(keycode)
+    if keycode == "q" then
+      love.event.quit(0)
+    end
 end

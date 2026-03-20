@@ -1,6 +1,6 @@
 Level = Object:extend()
 
-function Level:new()
+function Level:new(map)
     self.map = {}
     self.items = {}
     for y=1,7 do
@@ -9,15 +9,30 @@ function Level:new()
             self.map[y][x]={}
         end
     end
-    for y=2,6,2 do
-        for x=2,14,2 do
-            local wall = Wall(x,y)
-            wall.level=self
-            table.insert(self.items,wall)
-            self.map[y][x][1]=wall
+    local wallsLayer = map.layers["pillars"]
+    for y=1,wallsLayer.height do
+        for x=1,wallsLayer.width do
+            local tile = wallsLayer.data[y][x]
+            if tile then
+                local wall = Wall(x,y)
+                wall.level=self
+                self.map[y][x][1] = wall
+                table.insert(self.items,wall)
+            end
         end
     end
-    self:fillWithRubble()
+    local rubbleLayer = map.layers["rubble"]
+    for y=1,rubbleLayer.height do
+        for x=1,rubbleLayer.width do
+            local tile = rubbleLayer.data[y][x]
+            if tile then
+                local rubble = Rubble(x,y)
+                rubble.level = self
+                self.map[y][x][1] = rubble
+                table.insert(self.items,rubble)
+            end
+        end
+    end
     return self
 end
 
