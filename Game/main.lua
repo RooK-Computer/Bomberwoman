@@ -1,4 +1,6 @@
 Object = require "lib/classic"
+sti = require 'lib/sti' -- simple tiled loader for maps
+
 require "model"
 
 CurrentLevel = Level()
