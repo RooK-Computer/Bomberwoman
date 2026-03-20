@@ -1,5 +1,7 @@
 Object = require "lib/classic"
 require "util/tableExt"
+sti = require 'lib/sti' -- simple tiled loader for maps
+
 require "model"
 
 CurrentLevel = Level()
