@@ -6,7 +6,7 @@ function Bomb:new(x,y)
     self.destructible = true
     self.moves = false
     self.blastRadius=1
-    self.ttl = 5
+    self.ttl = 2
     self.exploding = false
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight(),0,0,0)
@@ -61,17 +61,23 @@ function Explosion:new(location,rotation,x,y)
     self.destructible = false
     self.moves = false
     self.killsOnContact = true
-    self.ttl = 1.1
+    self.ttl = 0.08*11
     self.rotation = rotation
     self.location = location
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight())
     if location == "center" then
-        self.animation = anim8.newAnimation(grid(8,'8-3',8,'4-8'),0.1)
+        self.animation = anim8.newAnimation(grid(8,'8-3',8,'4-8'),0.08,function(animation,loops)
+            self.ttl = 0
+        end)
     elseif location == "middle" then
-        self.animation = anim8.newAnimation(grid(7,"8-3",7,"4-8"),0.1)
+        self.animation = anim8.newAnimation(grid(7,"8-3",7,"4-8"),0.08,function(animation,loops)
+            self.ttl = 0
+        end)
     elseif location == "end" then
-        self.animation = anim8.newAnimation(grid(6,"8-3",6,"4-8"),0.1)
+        self.animation = anim8.newAnimation(grid(6,"8-3",6,"4-8"),0.08,function(animation,loops)
+            self.ttl = 0
+        end)
     end
 end
 
@@ -80,7 +86,7 @@ function Explosion:update(dt)
     self.ttl = self.ttl - dt
     if self.ttl < 0 then
         self.level:destroyItem(self)
-    elseif self.location == "center" or self.ttl <= 0.9 then
+    elseif self.location == "center" or self.ttl <= 0.08*11-2*0.08 then
         local items = tableExt.copy(self.level.map[self:getY()][self:getX()])
         for i,item in ipairs(items) do
             if item.destructible or item.canDie then

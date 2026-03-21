@@ -15,6 +15,8 @@ require "model"
 
 require "util/stack"
 require "util/input/inputmanager"
+require 'gameinput'
+
 inputManager = InputManager()
 
 LoadedLevel = sti("maps/bomberplane.lua",{},0,184)
@@ -25,17 +27,25 @@ CurrentLevel = Level(LoadedLevel)
 CurrentLevel:print()
 
 
-CurrentLevel:spawnItem(Bomb(3,3))
+Players = {
+    Player(1,1),
+    Player(15,1),
+    Player(15,7),
+    Player(1,7)
+}
 
-currentPlayer = Player(15,1)
-CurrentLevel:spawnItem(currentPlayer)
+UnoccupiedPlayers = Stack()
+UnoccupiedPlayers:push(Players[4])
+UnoccupiedPlayers:push(Players[3])
+UnoccupiedPlayers:push(Players[2])
+UnoccupiedPlayers:push(Players[1])
 
-require 'gameinput'
+for idx,player in ipairs(Players) do
+    CurrentLevel:spawnItem(player)
+end
+
 gameInput = GameInput()
 inputManager.HandlerStack:push(gameInput)
-
-
-
 
 
 function love.update(dt)
