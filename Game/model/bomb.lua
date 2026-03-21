@@ -1,6 +1,6 @@
 Bomb = Item:extend()
 
-function Bomb:new(x,y)
+function Bomb:new(x,y,onDestroy)
     Bomb.super.new(self,x,y)
     self.occupies = true
     self.destructible = true
@@ -8,6 +8,7 @@ function Bomb:new(x,y)
     self.blastRadius=1
     self.ttl = 2
     self.exploding = false
+    self.onDestroy = onDestroy
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight(),0,0,0)
     self.animation = anim8.newAnimation(grid(5,"5-3",5,"3-5"),0.2)
@@ -34,6 +35,7 @@ function Bomb:Destroy()
     if not self.exploding then
       self:explode()
     end
+    self.onDestroy()
 end
 
 function Bomb:explode()

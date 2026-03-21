@@ -127,10 +127,12 @@ function Level:moveItem(item,dirX,dirY)
     return true
 end
 
-function Level:ItemDropsItem(item,dropType)
+function Level:ItemDropsItem(item,dropItem)
     local x = item:getX()
     local y = item:getY()
-    local item = dropType(x,y)
+    local item = dropItem
+    item.x = x
+    item.y = y
     item.level = self
     table.insert(self.items,item)
     table.insert(self.map[y][x],item)

@@ -7,6 +7,7 @@ function Player:new(x,y)
     self.occupies = true
     self.ttl = 1
     self.isMoving = false
+    self.bombsInPlay = 0
 
     local grid = anim8.newGrid(9,14,sprites:getWidth(),sprites:getHeight(),0,33)
     self.animation_idle = anim8.newAnimation(grid(1,'1-2'),0.6)
@@ -57,5 +58,11 @@ function Player:moveUp()
 end
 
 function Player:placeBomb()
-    local bomb=self.level:ItemDropsItem(self,Bomb)
+    if self.bombsInPlay == 0 then
+        local bomb = Bomb(0,0,function()
+            self.bombsInPlay = self.bombsInPlay - 1
+        end)
+        local bomb=self.level:ItemDropsItem(self,bomb)
+        self.bombsInPlay = self.bombsInPlay + 1
+    end
 end
