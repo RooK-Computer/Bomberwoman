@@ -26,8 +26,6 @@ LoadedLevel:resize(1920,1080)
 
 CurrentLevel = Level(LoadedLevel)
 
-CurrentLevel:print()
-
 
 Players = {
     Player(1,1),
