@@ -32,6 +32,9 @@ function Player:draw()
     love.graphics.push()
     love.graphics.scale(8,8)
     love.graphics.setColor(1,1,1,self.ttl)
+    if self.afterLife then
+        love.graphics.translate(0,(1-self.ttl)*-5)
+    end
     self.animation_idle:draw(sprites,2,2)
     love.graphics.setColor(1,1,1,1)
     love.graphics.pop()
