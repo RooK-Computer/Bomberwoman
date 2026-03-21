@@ -4,6 +4,7 @@ function Level:new(map)
     self.map = {}
     self.levelfile = map
     self.items = {}
+    self.afterLife = {}
     for y=1,7 do
         self.map[y] = {}
         for x=1,15 do
@@ -68,6 +69,17 @@ function Level:update(dt)
     for idx,item in ipairs(self.items) do
         item:update(dt)
     end
+    local toRemove = {}
+    for idx,item in ipairs(self.afterLife) do
+        item:update(dt)
+        if not item.afterLife then 
+            table.insert(toRemove,item)
+        end
+    end
+    for idx,item in ipairs(toRemove) do
+        local idx = tableExt.find(self.afterLife,item)
+        table.remove(self.afterLife,idx)
+    end
 end
 
 function Level:draw()
@@ -75,6 +87,16 @@ function Level:draw()
     love.graphics.push()
     love.graphics.translate(0,184)
     for idx,item in ipairs(self.items) do
+        if item.translateDraw then
+            love.graphics.push()
+            love.graphics.translate((item:getX()-1)*128,(item:getY()-1)*128)
+        end
+        item:draw()
+        if item.translateDraw then
+            love.graphics.pop()
+        end
+    end
+    for idx,item in ipairs(self.afterLife) do
         if item.translateDraw then
             love.graphics.push()
             love.graphics.translate((item:getX()-1)*128,(item:getY()-1)*128)
@@ -152,4 +174,7 @@ function Level:destroyItem(item)
     idx = tableExt.find(self.items,item)
     table.remove(self.items,idx)
     item:Destroy()
+    if item.afterLife then
+        table.insert(self.afterLife,item)
+    end
 end

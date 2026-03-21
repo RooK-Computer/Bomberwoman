@@ -8,6 +8,7 @@ function Item:new(x,y)
     self.occupies=false
     self.killsOnContact=false
     self.translateDraw=true
+    self.afterLife=false
     self.level = nil
 end
 
