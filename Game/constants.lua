@@ -1,5 +1,5 @@
 Constants = {
-    TILE_SIZE = 120,
+    TILE_SIZE = 128,
     -- Tiles * TILE_SIZE / Seconds to traverse Map
-    VELOCITY = 15 * 120 / 5,
+    VELOCITY = 15 * 128 / 4,
 }

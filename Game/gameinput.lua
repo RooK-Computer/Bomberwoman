@@ -14,28 +14,43 @@ function GameInput:AllowedInputDevices()
 end
 
 function GameInput:OnRelease(joystick, button)
+    if button == "dpright" and self.player.move_x == 1 then
+        self.player.move_x = 0
+    end
+    if button == "dpleft" and self.player.move_x == -1 then
+        self.player.move_x = 0
+    end
+    if button == "dpup" and self.player.move_y == -1 then
+        self.player.move_y = 0
+    end
+    if button == "dpdown" and self.player.move_y == 1 then
+        self.player.move_y = 0
+    end
+end
+
+function GameInput:OnPress(joystick, button)
     if self.gamepad == nil then
         local newInput = GameInput()
         newInput.gamepad = joystick:getID()
         newInput.player = UnoccupiedPlayers:pop()
         inputManager.HandlerStack:push(newInput)
-        newInput:OnRelease(joystick, button)
+        newInput:OnPress(joystick, button)
         return
     end
-    local currentPlayer = self.player
+
     if button == "dpright" then
-        currentPlayer:moveRight()
+        self.player.move_x = 1
     end
     if button == "dpleft" then
-        currentPlayer:moveLeft()
+        self.player.move_x = -1
     end
     if button == "dpup" then
-        currentPlayer:moveUp()
+        self.player.move_y = -1
     end
     if button == "dpdown" then
-        currentPlayer:moveDown()
+        self.player.move_y = 1
     end
     if button == "b" then
-        currentPlayer:placeBomb()
+        self.player:placeBomb()
     end
 end
