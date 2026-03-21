@@ -115,14 +115,15 @@ function Level:ItemDropsItem(item,dropType)
     return item
 end
 
-function Level:spawnItem(itemType,x,y)
+function Level:spawnItem(item)
+    local x = item:getX()
+    local y = item:getY()
     if x < 1 or y < 1 or x > 15 or y > 7 then
         return nil
     end
     --the rules are as follows:
     --if the place is occupied, check the killing tables
     --to check that, we have to create the item first
-    local item = itemType(x,y)
     local placeable = true
     if self:isOccupied(x,y) then
         if item.killsOnContact then
