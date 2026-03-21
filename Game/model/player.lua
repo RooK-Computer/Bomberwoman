@@ -16,6 +16,7 @@ end
 
 function Player:Destroy()
     self.afterLife = true
+    self.playableBombs = 0
 end
 
 function Player:update(dt)
