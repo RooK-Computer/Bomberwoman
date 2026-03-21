@@ -41,3 +41,6 @@ end
 
 function Item:update(dt)
 end
+
+function Item:draw()
+end
