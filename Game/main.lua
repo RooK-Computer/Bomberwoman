@@ -1,6 +1,8 @@
 Object = require "lib/classic"
 require "util/tableExt"
 sti = require 'lib/sti' -- simple tiled loader for maps
+anim8 = require 'lib/anim8'
+sprites = love.graphics.newImage('assets/sprites.png')
 
 require "model"
 
