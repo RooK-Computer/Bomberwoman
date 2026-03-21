@@ -39,6 +39,9 @@ function Item:Occupies()
     return self.occupies
 end
 
+function Item:Destroy()
+end
+
 function Item:update(dt)
 end
 

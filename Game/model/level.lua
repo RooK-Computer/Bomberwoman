@@ -151,4 +151,5 @@ function Level:destroyItem(item)
     table.remove(self.map[item:getY()][item:getX()],idx)
     idx = tableExt.find(self.items,item)
     table.remove(self.items,idx)
+    item:Destroy()
 end

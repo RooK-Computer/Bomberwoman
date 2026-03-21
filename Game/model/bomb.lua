@@ -7,6 +7,7 @@ function Bomb:new(x,y)
     self.moves = false
     self.blastRadius=1
     self.ttl = 5
+    self.exploding = false
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight(),0,0,0)
     self.animation = anim8.newAnimation(grid(5,"5-3",5,"3-5"),0.2)
@@ -29,7 +30,14 @@ function Bomb:draw()
     love.graphics.pop()
 end
 
+function Bomb:Destroy()
+    if not self.exploding then
+      self:explode()
+    end
+end
+
 function Bomb:explode()
+    self.exploding = true
     --we have to destroy ourselves to ensure that the place is empty.
     self.level:destroyItem(self)
     self.level:spawnItem(Explosion("center",0,self:getX(),self:getY()))
@@ -55,6 +63,7 @@ function Explosion:new(location,rotation,x,y)
     self.killsOnContact = true
     self.ttl = 1.1
     self.rotation = rotation
+    self.location = location
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight())
     if location == "center" then
@@ -71,7 +80,7 @@ function Explosion:update(dt)
     self.ttl = self.ttl - dt
     if self.ttl < 0 then
         self.level:destroyItem(self)
-    else
+    elseif self.location == "center" or self.ttl <= 0.9 then
         local items = tableExt.copy(self.level.map[self:getY()][self:getX()])
         for i,item in ipairs(items) do
             if item.destructible or item.canDie then
