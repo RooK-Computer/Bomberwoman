@@ -2,6 +2,7 @@ Level = Object:extend()
 
 function Level:new(map)
     self.map = {}
+    self.levelfile = map
     self.items = {}
     for y=1,7 do
         self.map[y] = {}
@@ -104,10 +105,12 @@ function Level:spawnItem(itemType,x,y)
     local item = itemType(x,y)
     local placeable = true
     if self:isOccupied(x,y) then
-        if self.map[y][x][1].canDie then 
-            placeable = true
-        else
-            placeable = false
+        if item.killsOnContact then
+            if self.map[y][x][1].canDie or self.map[y][x][1].destructible then
+                placeable = true
+            else
+                placeable = false
+            end     
         end
     end
     if placeable then
@@ -118,6 +121,9 @@ function Level:spawnItem(itemType,x,y)
 end
 
 function Level:destroyItem(item)
+    if item:is(Rubble) then
+        self.levelfile:setLayerTile("rubble",item:getX(),item:getY(),nil)
+    end
     local idx = tableExt.find(self.map[item:getY()][item:getX()],item)
     table.remove(self.map[item:getY()][item:getX()],idx)
     idx = tableExt.find(self.items,item)

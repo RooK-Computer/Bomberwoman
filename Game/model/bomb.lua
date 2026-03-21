@@ -44,6 +44,12 @@ function Explosion:update(dt)
     self.ttl = self.ttl - dt
     if self.ttl < 0 then
         self.level:destroyItem(self)
+    else
+        local items = tableExt.copy(self.level.map[y][x])
+        for i,item in ipairs(items) do
+            if item.destructible or item.canDie then
+                self.level:destroyItem(item)
+            end
+        end
     end
-    --TODO check if location contains killable items and kill them
 end
