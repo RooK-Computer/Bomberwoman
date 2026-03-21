@@ -3,6 +3,8 @@ require "util/tableExt"
 sti = require 'lib/sti' -- simple tiled loader for maps
 anim8 = require 'lib/anim8'
 sprites = love.graphics.newImage('assets/sprites.png')
+sprites:setFilter("nearest", "nearest", 1)
+sprites:setWrap("clampzero", "clampzero")
 
 require "model"
 
