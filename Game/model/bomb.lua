@@ -9,7 +9,7 @@ function Bomb:new(x,y)
     self.ttl = 5
 
     local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight(),0,0,0)
-    self.animation = anim8.newAnimation(grid(5,"5-3"),0.2)
+    self.animation = anim8.newAnimation(grid(5,"5-3",5,"3-5"),0.2)
 end
 
 function Bomb:update(dt)
@@ -49,10 +49,14 @@ function Explosion:new(x,y)
     self.destructible = false
     self.moves = false
     self.killsOnContact = true
-    self.ttl = 2
+    self.ttl = 1.4
+
+    local grid = anim8.newGrid(16,16,sprites:getWidth(),sprites:getHeight())
+    self.animation = anim8.newAnimation(grid(8,'6-3',8,'4-6'),0.2)
 end
 
 function Explosion:update(dt)
+    self.animation:update(dt)
     self.ttl = self.ttl - dt
     if self.ttl < 0 then
         self.level:destroyItem(self)
@@ -64,4 +68,11 @@ function Explosion:update(dt)
             end
         end
     end
+end
+
+function Explosion:draw()
+    love.graphics.push()
+    love.graphics.scale(128 / 16, 128 / 16)
+    self.animation:draw(sprites,0,0)
+    love.graphics.pop()
 end
