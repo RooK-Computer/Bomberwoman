@@ -17,14 +17,15 @@ require "util/stack"
 require "util/input/inputmanager"
 require 'gameinput'
 
+require "gametimer"
+require "components/hurryup"
+
 inputManager = InputManager()
 
 LoadedLevel = sti("maps/bomberplane.lua",{},0,184)
 LoadedLevel:resize(1920,1080)
 
 CurrentLevel = Level(LoadedLevel)
-
-CurrentLevel:print()
 
 
 Players = {
@@ -47,15 +48,42 @@ end
 gameInput = GameInput()
 inputManager.HandlerStack:push(gameInput)
 
+Components = {}
+
+timer = GameTimer(function()
+    local comp = HurryUp(CurrentLevel)
+    table.insert(Components,comp)
+end)
+
 
 function love.update(dt)
     CurrentLevel:update(dt)
+    timer:update(dt)
+    local toDelete={}
+    for i,comp in ipairs(Components) do
+        comp:update(dt)
+        if comp.done then
+            table.insert(toDelete,comp)
+        end
+    end
+    for i,comp in ipairs(toDelete) do
+        local idx = tableExt.find(Components,comp)
+        table.remove(Components,idx)
+    end
 end
 
 function love.draw()
     push:start()
 
     CurrentLevel:draw()
+    love.graphics.push()
+    love.graphics.translate(92,92)
+    timer:draw()
+    love.graphics.pop()
+
+    for i,comp in ipairs(Components) do
+        comp:draw()
+    end
 
     push:finish()
 end

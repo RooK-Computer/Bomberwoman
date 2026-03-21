@@ -8,6 +8,8 @@ function Player:new(x,y)
     self.destructible = true
     self.occupies = true
     self.ttl = 1
+    self.bombsInPlay = 0
+    self.playableBombs = 1
     self.real_x = x * Constants.TILE_SIZE
     self.real_y = y * Constants.TILE_SIZE 
     self.real_draw_offset_x = 0
@@ -19,6 +21,7 @@ end
 
 function Player:Destroy()
     self.afterLife = true
+    self.playableBombs = 0
 end
 
 function Player:update(dt)
@@ -89,5 +92,11 @@ function Player:moveUp()
 end
 
 function Player:placeBomb()
-    local bomb=self.level:ItemDropsItem(self,Bomb)
+    if self.bombsInPlay < self.playableBombs then
+        local bomb = Bomb(0,0,function()
+            self.bombsInPlay = self.bombsInPlay - 1
+        end)
+        local bomb=self.level:ItemDropsItem(self,bomb)
+        self.bombsInPlay = self.bombsInPlay + 1
+    end
 end
