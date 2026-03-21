@@ -1,6 +1,8 @@
 require "model/item"
 require "model/wall"
 require "model/rubble"
+require "model/hurrywall"
 require "model/level"
 require "model/player"
 require "model/bomb"
+require "model/component"
