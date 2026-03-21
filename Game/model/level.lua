@@ -70,6 +70,16 @@ function Level:update(dt)
     end
 end
 
+function Level:draw()
+    self.levelfile:draw()
+    love.graphics.push()
+    love.graphics.translate(0,184)
+    for idx,item in ipairs(self.items) do
+        item:draw()
+    end
+    love.graphics.pop()
+end
+
 function Level:moveItem(item,dirX,dirY)
     --TODO check if item can die and if destination has killsOnContact item
     local newX = item:getX()+dirX

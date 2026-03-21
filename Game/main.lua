@@ -12,12 +12,14 @@ CurrentLevel = Level(LoadedLevel)
 
 CurrentLevel:print()
 
+CurrentLevel:spawnItem(Bomb,1,1)
+
 function love.update(dt)
     CurrentLevel:update(dt)
 end
 
 function love.draw()
-    LoadedLevel:draw()
+    CurrentLevel:draw()
 end
 
 function love.keypressed(keycode)
