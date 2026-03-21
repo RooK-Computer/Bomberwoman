@@ -12,6 +12,10 @@ push:setupScreen(1920, 1080, windowWidth, windowHeight, {fullscreen = true})
 
 require "model"
 
+require "util/stack"
+require "util/input/inputmanager"
+inputManager = InputManager()
+
 LoadedLevel = sti("maps/bomberplane.lua",{},0,184)
 LoadedLevel:resize(1920,1080)
 
@@ -21,7 +25,17 @@ CurrentLevel:print()
 
 
 CurrentLevel:spawnItem(Bomb(3,3))
-CurrentLevel:spawnItem(Player(15,1))
+
+currentPlayer = Player(15,1)
+CurrentLevel:spawnItem(currentPlayer)
+
+require 'gameinput'
+gameInput = GameInput()
+inputManager.HandlerStack:push(gameInput)
+
+
+
+
 
 function love.update(dt)
     CurrentLevel:update(dt)
@@ -33,10 +47,4 @@ function love.draw()
     CurrentLevel:draw()
 
     push:finish()
-end
-
-function love.keypressed(keycode)
-    if keycode == "q" then
-      love.event.quit(0)
-    end
 end

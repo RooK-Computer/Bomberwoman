@@ -6,6 +6,7 @@ function Player:new(x,y)
     self.destructible = true
     self.occupies = true
     self.ttl = 1
+    self.isMoving = false
 
     local grid = anim8.newGrid(9,14,sprites:getWidth(),sprites:getHeight(),0,33)
     self.animation_idle = anim8.newAnimation(grid(1,'1-2'),0.6)
