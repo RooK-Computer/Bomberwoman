@@ -5,7 +5,6 @@ function Player:new(x,y)
     self.moves = true
     self.destructible = true
     self.occupies = true
-    self.canDie = true
 end
 
 function Player:moveRight()

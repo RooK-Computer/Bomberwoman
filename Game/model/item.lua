@@ -7,7 +7,7 @@ function Item:new(x,y)
     self.moves=false
     self.occupies=false
     self.killsOnContact=false
-    self.canDie=false
+    self.translateDraw=true
     self.level = nil
 end
 

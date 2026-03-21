@@ -14,7 +14,7 @@ CurrentLevel = Level(LoadedLevel)
 
 CurrentLevel:print()
 
-CurrentLevel:spawnItem(Bomb,1,1)
+CurrentLevel:spawnItem(Bomb,3,1)
 
 function love.update(dt)
     CurrentLevel:update(dt)

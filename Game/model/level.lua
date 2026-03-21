@@ -75,7 +75,14 @@ function Level:draw()
     love.graphics.push()
     love.graphics.translate(0,184)
     for idx,item in ipairs(self.items) do
+        if item.translateDraw then
+            love.graphics.push()
+            love.graphics.translate((item:getX()-1)*128,(item:getY()-1)*128)
+        end
         item:draw()
+        if item.translateDraw then
+            love.graphics.pop()
+        end
     end
     love.graphics.pop()
 end
@@ -109,6 +116,9 @@ function Level:ItemDropsItem(item,dropType)
 end
 
 function Level:spawnItem(itemType,x,y)
+    if x < 1 or y < 1 or x > 15 or y > 7 then
+        return nil
+    end
     --the rules are as follows:
     --if the place is occupied, check the killing tables
     --to check that, we have to create the item first
@@ -116,7 +126,7 @@ function Level:spawnItem(itemType,x,y)
     local placeable = true
     if self:isOccupied(x,y) then
         if item.killsOnContact then
-            if self.map[y][x][1].canDie or self.map[y][x][1].destructible then
+            if self.map[y][x][1].destructible then
                 placeable = true
             else
                 placeable = false
@@ -127,7 +137,9 @@ function Level:spawnItem(itemType,x,y)
         table.insert(self.map[y][x],item)
         table.insert(self.items,item)
         item.level=self
+        return item
     end
+    return nil
 end
 
 function Level:destroyItem(item)
